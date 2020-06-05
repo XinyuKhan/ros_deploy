@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# only run as root
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
   exit
@@ -37,3 +38,15 @@ echo "deb https://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ bionic main" > /etc/a
 apt-get update && apt-get install -y --no-install-recommends \
     ros-melodic-ros-core=1.4.1-0* \
     && rm -rf /var/lib/apt/lists/*
+
+
+
+# add source cmd to shell rc
+SHELL_RC=`grep $CALL_USER </etc/passwd | cut -f 7 -d ":" | cut -f 3 -d "/"`
+SOURCE_SCRIPT="source /opt/ros/$ROS_DISTRO/setup.${SHELL_RC}"
+SHELL_RC_PATH="/home/$CALL_USER/.${SHELL_RC}rc"
+
+echo "->> Append $SOURCE_SCRIPT to file ${SHELL_RC_PATH}."
+grep -q "$SOURCE_SCRIPT" $SHELL_RC_PATH || echo "$SOURCE_SCRIPT" >> $SHELL_RC_PATH
+
+
